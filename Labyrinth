@@ -1,0 +1,137 @@
+#include <bits/stdc++.h>
+ 
+using namespace std;
+// #define int long long
+int mod = 1000000007;
+ 
+ 
+// void dfs(int i, int j, vector<vector<int>> &vis,vector<vector<char>> &arr, int n ,int m){
+// 	vis[i][j] = 1;
+// 	int dr[]={0,-1,0,+1};
+// 	int dc[]={-1,0,1,0};
+// 	for(int z =0;z<4;z++)
+// 	{
+// 		int nr = i+dr[z];
+// 		int nc = j+dc[z];
+// 		if(nr>=0 && nr<n && nc>=0 && nc<m && vis[nr][nc]==0 && arr[nr][nc] == '.')
+// 		{
+// 			dfs(nr,nc,vis,arr,n,m);
+// 		}
+// 	}
+// }
+ 
+ 
+signed main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    int n , m;
+    cin>>n>>m;
+	pair<int,int> start , end;
+	vector<vector<char>> arr(n,vector<char>(m));
+	vector<vector<pair<int,int>>> vis(n,vector<pair<int,int>>(m,{INT_MAX,-1}));//{dist,1 - up 2 right 3 down 4 left,5 start}
+	queue< pair<pair<int,int>,int> > q;
+	for(int i =0;i<n;i++)
+	{
+		for(int j =0;j<m;j++)
+		{
+			cin>>arr[i][j];
+			if(arr[i][j] == 'A')
+			{
+				vis[i][j] = {0,5};
+				q.push({{i,j},0});
+				start = {i,j};
+			}
+			if(arr[i][j] == 'B')
+			{
+				end = {i,j};
+			}
+		}
+	}
+	bool flag = false;
+	while(!q.empty() && !flag)
+	{
+		int row = q.front().first.first;
+		int col = q.front().first.second;
+		int dist = q.front().second;
+		q.pop();
+		int dr[]={0,-1,0,+1};
+		int dc[]={-1,0,1,0};
+		for(int z =0;z<4;z++)
+		{
+			int nr = row+dr[z];
+			int nc = col+dc[z];
+			if(nr>=0 && nr<n && nc>=0 && nc<m && vis[nr][nc].first==INT_MAX && (arr[nr][nc] == '.' || arr[nr][nc] == 'B'))
+			{
+				if(z==0){
+					vis[nr][nc] = {dist+1,2};
+				}
+				else if(z==1){
+					vis[nr][nc] = {dist+1,3};
+				}
+				else if(z==2){
+					vis[nr][nc] = {dist+1,4};
+				}
+				else if(z==3){
+					vis[nr][nc] = {dist+1,1};
+				}
+				q.push({{nr,nc},dist+1});
+				if (arr[nr][nc] == 'B'){
+					flag = true;
+					break;
+				} // early stop if found destination
+				
+			}
+		}
+	}
+ 
+	
+	vector<char> ans;
+	if(vis[end.first][end.second].first == INT_MAX)
+	{
+		cout<<"NO"<<endl;
+	}
+	else
+	{
+		cout<<"YES"<<endl;
+		cout<<vis[end.first][end.second].first<<endl;
+		int i = end.first;
+		int j = end.second;
+		while(true)
+		{
+			if(vis[i][j].second == 5)
+			{
+				break;
+			}
+			if(vis[i][j].second == 1)
+			{
+				ans.push_back('D');
+				i--;
+			}
+			else if(vis[i][j].second == 2)
+			{
+				ans.push_back('L');
+				j++;
+			}
+			else if(vis[i][j].second == 3)
+			{
+				ans.push_back('U');
+				i++;
+			}
+			else if(vis[i][j].second == 4)
+			{
+				ans.push_back('R');
+				j--;
+			}
+		}
+	}
+ 
+		reverse(ans.begin(),ans.end());
+		for(auto x:ans)
+		{
+			cout<<x;
+		}
+		cout<<endl;
+    return 0;
+}
