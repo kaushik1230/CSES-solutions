@@ -1,0 +1,106 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+// #define int long long
+int mod = 1000000007;
+
+
+// void dfs(int i, int j, vector<vector<int>> &vis,vector<vector<char>> &arr, int n ,int m){
+// 	vis[i][j] = 1;
+// 	int dr[]={0,-1,0,+1};
+// 	int dc[]={-1,0,1,0};
+// 	for(int z =0;z<4;z++)
+// 	{
+// 		int nr = i+dr[z];
+// 		int nc = j+dc[z];
+// 		if(nr>=0 && nr<n && nc>=0 && nc<m && vis[nr][nc]==0 && arr[nr][nc] == '.')
+// 		{
+// 			dfs(nr,nc,vis,arr,n,m);
+// 		}
+// 	}
+// }
+
+int findSet(int i , vector<int>& parent){
+	if(parent[i]==-1)
+	return i;
+	return parent[i]=findSet(parent[i],parent);
+}
+
+void union_Find(int x , int y , vector<int>& rank ,vector<int>& par){
+	int set_x = findSet(x,par);
+	int set_y = findSet(y,par);
+	if(set_x!=set_y){
+		int rank_x = rank[set_x];
+		int rank_y = rank[set_y];
+		if(rank_x > rank_y){
+			rank[set_x]+=rank_y;
+			par[set_y] = set_x;
+		}
+		else{
+			rank[set_y]+=rank_x;
+			par[set_x] = set_y;
+		}
+	}
+}
+
+signed main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    int n , m; // no of cities and no of roads
+    cin>>n>>m;
+	vector<int> par(n+1,-1);
+	vector<int> rank(n+1,1);
+	vector<vector<int>> adj(n+1);
+	vector<int> track(n+1,-1);
+	for(int i =0;i<m;i++){
+		int a , b;
+		cin>>a>>b;
+		// union_Find(a,b,rank,par);
+		adj[a].push_back(b);
+		adj[b].push_back(a);
+	}
+	// if(findSet(1,par)!=findSet(n,par)){
+	// 	cout<<"IMPOSSIBLE";
+	// }
+	// else{
+		queue<pair<pair<int,int>,int>> q;
+		q.push({{1,0},-1});
+		vector<int> visited(n+1,-1);
+		visited[1]=1;
+		while(!q.empty()){
+			int node = q.front().first.first;
+			int dist = q.front().first.second;
+			int parents = q.front().second;
+			q.pop();
+			if(node == n){ cout<<dist+1<<endl; break;}
+			for(auto x:adj[node]){
+				if(x!=parents && visited[x]==-1){
+					q.push({{x,dist+1},node});
+					track[x]=node;
+					visited[x]=1;
+				}
+			}
+		}
+		if(visited[n]==-1){
+			cout<<"IMPOSSIBLE";
+		}
+		else{
+			vector<int> ans;
+			int ptr = n;
+			while(true){
+				ans.push_back(ptr);
+				if(ptr == 1) break;
+				ptr = track[ptr];
+			}
+			reverse(ans.begin(),ans.end());
+			for(auto x:ans){
+				cout<<x<<" ";
+			}
+
+		}
+
+	// }
+    return 0;
+}
